@@ -6,6 +6,7 @@ $user = new User($pdo);
 if(isset($_GET['logout'])) {
   $user->logout();
 }
+
 ?>
 
 <!DOCTYPE html>
