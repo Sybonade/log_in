@@ -1,0 +1,14 @@
+.hero-section {
+	background-image: url('../img/car-hero-img.jpg');
+	background-size: cover;
+	background-repeat: no-repeat;
+	min-height: 500px;	
+	opacity: 0.5;
+	
+}
+
+#hero-slogan {
+	color: #f5f5f5 !important;
+	
+}
+
