@@ -8,7 +8,7 @@ if(isset($_POST['add-user'])) {
         $user->register($_POST['name'], $_POST['mail'], $_POST['upass']);
 
     }else {
-    foreach ($feedbackMessage as $item) {
+    foreach ($feedback as $item) {
         echo $item;
     }
 }

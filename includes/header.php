@@ -7,6 +7,23 @@ if(isset($_GET['logout'])) {
   $user->logout();
 }
 
+
+$menuLinks = array(
+  "home.php"=>"Home",
+
+   "index.php"=>"Log in",
+
+   "account.php"=>"Account",
+
+
+  );
+
+  $adminMenuLinks = array(  
+     "admin.php"=>"Admin",
+    );
+  
+
+
 ?>
 
 <!DOCTYPE html>
@@ -30,21 +47,36 @@ if(isset($_GET['logout'])) {
     </button>
     <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
       <ul class="navbar-nav">
-        <li class="nav-item">
-          <a class="nav-link " href="home.php">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="index.php">Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="account.php">Account</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="register.php">Register</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="?logout=1.php">Log out</a>
-        </li>
+        <?php //Every new menu item comes here
+        foreach ($menuLinks as $x => $y) {
+        echo "<li class='nav-item'>
+          <a class='nav-link ' href='$x'>$y</a>
+        </li>";
+        }?>
+
+<?php 
+
+
+        //Checks if user is logged in
+        if(isset($_SESSION['user_id'])) {
+          //menu items only for admins
+          if ($user->checkUserRole(500)) {
+            foreach ($adminMenuLinks as $x => $y) {
+                    echo "<li class='nav-item'>
+                      <a class='nav-link ' href='$x' >$y</a>
+                    </li>";
+                    }}
+          //standar menu items depending if logged in or not
+          echo "<li class='nav-item'>
+          <a class='nav-link ' href='?logout=1.php'>Log out</a>
+        </li>";
+        }else {
+          echo "<li class='nav-item'>
+          <a class='nav-link ' href='register.php'>Register</a>
+        </li>";
+        }
+        ?>
+        
       </ul>
     </div>
   </div>

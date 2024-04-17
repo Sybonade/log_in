@@ -30,15 +30,26 @@ private function cleanInput($data) {
        $errorMessages = [];
        $errorState = 0;
         //Checking if username or email is taken
-        $stmt_checkUsername = $this->pdo->prepare('SELECT * FROM table_user WHERE u_name = :uname OR u_email = :umail');
-        $stmt_checkUsername->bindParam(":uname", $uname, PDO::PARAM_STR);
-        $stmt_checkUsername->bindParam(":umail", $umail, PDO::PARAM_STR);
-        $stmt_checkUsername->execute();
+        if(isset($_POST['add-user'])) {
+            $stmt_checkUsername = $this->pdo->prepare('SELECT * FROM table_user WHERE u_name = :uname OR u_email = :umail');
+            $stmt_checkUsername->bindParam(":uname", $uname, PDO::PARAM_STR);
+            $stmt_checkUsername->bindParam(":umail", $umail, PDO::PARAM_STR);
+            $stmt_checkUsername->execute();
 
 
-        if ($stmt_checkUsername->rowCount() > 0) {
-            array_push($errorMessages,"Username or email is already taken ");
-            $errorState = 1;
+            if ($stmt_checkUsername->rowCount() > 0) {
+                array_push($errorMessages,"Username or email is already taken ");
+                $errorState = 1;
+            }
+            //Checking user email for update user
+        }else {
+            $stmt_checkEmail = $this->pdo->prepare('SELECT * FROM table_user WHERE u_email = :umail');
+            $stmt_checkEmail->bindParam(":umail", $umail, PDO::PARAM_STR);
+            $stmt_checkEmail->execute();
+            if ($stmt_checkEmail->rowCount() > 0) {
+                array_push($errorMessages,"Email is already taken ");
+                $errorState = 1;
+            }
         }
         //check if password is long enough and they match
         if($upass !== $upassrepeat) {
@@ -106,6 +117,7 @@ private function cleanInput($data) {
         if(password_verify($upass , $userData['u_password'])){
             $_SESSION['user_id'] = $userData['u_id'] ;
             $_SESSION['user_name'] = $userData['u_name'];
+            $_SESSION['user_email'] = $userData['u_email'];
             $_SESSION['user_role'] = $userData['u_role_fk'];
             header('Location: home.php');
         }else {
@@ -131,7 +143,7 @@ private function cleanInput($data) {
         $stmt_checkUserRole->bindParam(":id", $_SESSION['user_role']);
         $stmt_checkUserRole->execute();
         $rolefk = $stmt_checkUserRole->fetch();
-
+        
         if($rolefk['r_level'] >= $value) {
             return TRUE;
         }else {
@@ -149,30 +161,57 @@ private function cleanInput($data) {
     public function editUserInfo($umail, $upass,  $newpass) {
         $errorMessages = [];
         $errorState = 0;
- 
-        $stmt_selectLoginInfo = $this->pdo->prepare('SELECT * FROM table_user WHERE u_id = :id');
+        //Get old user password to verify if it matches
+        $stmt_selectLoginInfo = $this->pdo->prepare('SELECT u_password FROM table_user WHERE u_id = :id');
         $stmt_selectLoginInfo->bindParam(":id", $_SESSION['user_id'], PDO::PARAM_STR);
         $stmt_selectLoginInfo->execute();
 
         //Save user data to an array
-        $userData = $stmt_selectLoginInfo->fetchAll();
+        $userData = $stmt_selectLoginInfo->fetch();
 
-        foreach ($userData as $row){
-        if(password_verify($upass , $row['u_password'])){
+        
+        if(password_verify($upass , $userData['u_password'])){
 
         $new_upass = password_hash($newpass, PASSWORD_DEFAULT);
-
+        //Updating user info
         $stmt_updateUserInfo = $this->pdo->prepare('UPDATE table_user SET u_email = :umail, u_password = :upassword WHERE u_id = :id ');
         $stmt_updateUserInfo->bindParam(":id" , $_SESSION['user_id'], PDO::PARAM_INT);
-        $stmt_updateUserInfo->bindParam(":umail" , $umail, PDO::PARAM_INT);
-        $stmt_updateUserInfo->bindParam(":upassword" , $new_upass, PDO::PARAM_INT);
-        $stmt_updateUserInfo->execute(); 
+        $stmt_updateUserInfo->bindParam(":umail" , $umail, PDO::PARAM_STR);
+        $stmt_updateUserInfo->bindParam(":upassword" , $new_upass, PDO::PARAM_STR);
+
+        if ($stmt_updateUserInfo->execute()) {
+            $_SESSION['user_email'] = $umail;
+            header('Location: account.php?succes=1');
+        } 
+
     }else {
         array_push($errorMessages,"Something went wrong");
         $errorState = 1;
+        return $errorMessages;
 
     }
-        }
+        
+    }
+
+    public function searchUsers($input) {
+        $inputJoker = "%{$input}%";
+        $stmt_searchUserInfo = $this->pdo->prepare('SELECT * FROM table_user WHERE u_name LIKE :uname OR u_email Like :email');
+        $stmt_searchUserInfo->bindParam(':uname', $inputJoker, PDO::PARAM_STR);
+        $stmt_searchUserInfo->bindParam(':email', $inputJoker, PDO::PARAM_STR);
+        $stmt_searchUserInfo->execute();
+        $userArray = $stmt_searchUserInfo->fetchAll();
+        return $userArray;
+
+    }
+
+
+
+    public function getUserInfo($userId) {
+        $stmt_fetchUserData = $this->pdo->prepare('SELECT * FROM table_user WHERE u_id = :uid');
+        $stmt_fetchUserData->bindParam(':uid', $userId, PDO::PARAM_INT);
+        $stmt_fetchUserData->execute();
+        $userDataArray = $stmt_fetchUserData->fetch();
+        return $userDataArray;
     }
 
 
