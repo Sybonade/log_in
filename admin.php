@@ -33,7 +33,7 @@ if(isset($_POST['search'])) {
         </div>
 
         <a href="home.php" type="button" class="btn btn-primary mt-3">Return</a>
-        <button type="submit" name="edit-user" class="btn btn-success mt-3">Update Info</button>
+        <button type="submit" name="search-button" class="btn btn-success mt-3">Search</button>
         </form> 
 </div>
 

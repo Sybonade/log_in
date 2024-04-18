@@ -1,18 +1,26 @@
 <?php
 include_once 'includes/header.php';
 
-$user->checkLoginStatus();
+if ($user->checkUserRole(500)) {
+    
+}
+else {
+    header('Location: home.php');
+}
+
+$user -> checkLoginStatus();
 
 
 $userInfoArray = $user->getUserInfo($_GET['uid']);
 
 $roleArray = $pdo->query('SELECT * FROM table_role')->fetchAll();
 
-if(isset($_POST['edit-user'])) {
-	$feedback = $user->checkUserRegisterInput($_SESSION['user_name'], $_POST['mail'], $_POST['newupass'], $_POST['newupassrepeat']);
+if(isset($_POST['admin-edit-user'])) {
+    if(isset($_POST['is_disabled'])) {$ustatus=0;}else{$ustatus=1;}
+	$feedback = $user->checkUserRegisterInput($_POST['name'], $_POST['mail'], $_POST['newupass'], $_POST['newupassrepeat']);
 
     if($feedback === 1){
-        $user->editUserInfo($_POST['mail'],$_POST['upass'], $_POST['newupass']);
+        $editFeedback = $user->editUserInfo($_POST['mail'],$_POST['upass'], $_POST['newupass'], $_GET['uid'], $_POST['urole'], $ustatus);
 
     }else {
     foreach ($feedback as $item) {
@@ -38,7 +46,7 @@ if(isset($_GET['succes'])) {
         <form method="post" >
         <div class="form-group " style="max-width: 250px;">
             <label for="name">Username</label>
-            <input type="text" name="name" class="form-control" id="name" value="<?php echo $userInfoArray['u_name']; ?>">
+            <input type="text" name="name" readonly class="form-control" id="name" value="<?php echo $userInfoArray['u_name']; ?>">
         </div> 
         <div class="form-group mt-3" style="max-width: 250px;">
             <label for="mail">Email address</label>
@@ -46,8 +54,7 @@ if(isset($_GET['succes'])) {
         </div>                                                      
         
         <div class="form-group mt-3" style="max-width: 250px;">
-            <label for="upass">Old Password</label>
-            <input type="password" name="upass" class="form-control" id="upass" placeholder="Password">
+            <input type="password" name="upass" hidden class="form-control" id="upass" placeholder="Password" value="asdf1234" readonly>
             <label for="upass">New Password</label>
             <input type="password" name="newupass" class="form-control" id="upass" placeholder="Password">
             <label class="mt-3" for="upassrepeat">Re-enter new password</label>
@@ -57,15 +64,41 @@ if(isset($_GET['succes'])) {
             <select name="urole" id="role">
                 <?php 
                 foreach ($roleArray as $role) {
-                    echo "<option value='{$role['r_id']}'>{$role['r_name']}</option> ";
+                    if($role['r_id'] === $userInfoArray['u_role_fk']) {
+                        $selected = " selected";
+                    }else {
+                        $selected = "";
+                    }
+                    echo "<option {$selected} value='{$role['r_id']}'>{$role['r_name']}</option> ";
                 }?>
             </select>
+            <br>
+
+            <div class="mt-3">
+                <label for="is-disabled">Disable account</label>
+                <input type="checkbox" id="is-disabled" name="is_disabled" value="1" <?php if($userInfoArray['u_status'] === 0) { echo "checked"; } ?> ><br>
+
+            </div>
 
 
         </div>
 
         <a href="home.php" type="button" class="btn btn-primary mt-3">Return</a>
-        <button type="submit" name="edit-user" class="btn btn-success mt-3">Update Info</button>
+        <button type="submit" name="admin-edit-user" class="btn btn-success mt-3">Update Info</button>
 
         </form> 
+
+        <div class="row">
+            <form>
+                <a href="confirm_delete.php?uid=<?php echo $_GET['uid']?>" type="button"  class="btn btn-danger mt-3 float-end">Delete user</a>
+            </form>
+        </div>
+    </div>
 </div>
+
+
+
+
+<?php 
+include_once 'includes/footer.php';
+?>

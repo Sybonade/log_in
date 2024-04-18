@@ -4,12 +4,9 @@
 include_once 'config.php';
 
 class User {
-    public $username;
-    public $email;
-    private $password;
-    public $role;
+    private $role;
     private $status;
-    public $pdo;
+    private $pdo;
   
     public function __construct($pdo) {
         $this->role = 4;
@@ -158,40 +155,43 @@ private function cleanInput($data) {
         header('Location: index.php');
     }
 
-    public function editUserInfo($umail, $upass,  $newpass) {
+    public function editUserInfo($umail, $upass,  $newpass, $uid, $role, $status) {
         $errorMessages = [];
         $errorState = 0;
         //Get old user password to verify if it matches
         $stmt_selectLoginInfo = $this->pdo->prepare('SELECT u_password FROM table_user WHERE u_id = :id');
-        $stmt_selectLoginInfo->bindParam(":id", $_SESSION['user_id'], PDO::PARAM_STR);
+        $stmt_selectLoginInfo->bindParam(":id", $uid, PDO::PARAM_STR);
         $stmt_selectLoginInfo->execute();
 
         //Save user data to an array
         $userData = $stmt_selectLoginInfo->fetch();
 
+        if(isset($_POST['edit-user'])){
+        if(!password_verify($upass , $userData['u_password'])){
+            return "The password is invalid ";
+            }
+        } 
         
-        if(password_verify($upass , $userData['u_password'])){
 
+    
+        
         $new_upass = password_hash($newpass, PASSWORD_DEFAULT);
         //Updating user info
-        $stmt_updateUserInfo = $this->pdo->prepare('UPDATE table_user SET u_email = :umail, u_password = :upassword WHERE u_id = :id ');
-        $stmt_updateUserInfo->bindParam(":id" , $_SESSION['user_id'], PDO::PARAM_INT);
+        $stmt_updateUserInfo = $this->pdo->prepare('UPDATE table_user SET u_email = :umail, u_password = :upassword, u_role_fk = :urole, u_status = :ustatus WHERE u_id = :id ');
+        $stmt_updateUserInfo->bindParam(":id" , $uid, PDO::PARAM_INT);
         $stmt_updateUserInfo->bindParam(":umail" , $umail, PDO::PARAM_STR);
         $stmt_updateUserInfo->bindParam(":upassword" , $new_upass, PDO::PARAM_STR);
-
-        if ($stmt_updateUserInfo->execute()) {
+        $stmt_updateUserInfo->bindParam(":urole" , $role, PDO::PARAM_INT);
+        $stmt_updateUserInfo->bindParam(":ustatus" , $status, PDO::PARAM_INT);
+        if ($stmt_updateUserInfo->execute() && $uid == $_SESSION['user_id']) {
             $_SESSION['user_email'] = $umail;
             header('Location: account.php?succes=1');
-        } 
-
-    }else {
-        array_push($errorMessages,"Something went wrong");
-        $errorState = 1;
-        return $errorMessages;
-
+        } else {
+            array_push($errorMessages,"Something went wrong");
+            $errorState = 1;
+            return $errorMessages;      
     }
-        
-    }
+}
 
     public function searchUsers($input) {
         $inputJoker = "%{$input}%";
@@ -207,11 +207,25 @@ private function cleanInput($data) {
 
 
     public function getUserInfo($userId) {
-        $stmt_fetchUserData = $this->pdo->prepare('SELECT * FROM table_user WHERE u_id = :uid');
-        $stmt_fetchUserData->bindParam(':uid', $userId, PDO::PARAM_INT);
-        $stmt_fetchUserData->execute();
-        $userDataArray = $stmt_fetchUserData->fetch();
+        $stmt_selectUserData = $this->pdo->prepare('SELECT * FROM table_user WHERE u_id = :uid');
+        $stmt_selectUserData->bindParam(':uid', $userId, PDO::PARAM_INT);
+        $stmt_selectUserData->execute();
+        $userDataArray = $stmt_selectUserData->fetch();
         return $userDataArray;
+    }
+
+
+
+    public function deleteUser($uid){
+        $stmt_deleteUser = $this->pdo->prepare('DELETE FROM table_user WHERE u_id = :uid');
+        $stmt_deleteUser->bindParam(':uid', $uid, PDO::PARAM_INT);
+
+        if($stmt_deleteUser->execute()) {
+            header('Location: confirm_delete.php?succes=1');
+        }else {
+            return "There was a error";
+        }
+
     }
 
 

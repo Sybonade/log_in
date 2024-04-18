@@ -8,7 +8,7 @@ if(isset($_POST['edit-user'])) {
 	$feedback = $user->checkUserRegisterInput($_SESSION['user_name'], $_POST['mail'], $_POST['newupass'], $_POST['newupassrepeat']);
 
     if($feedback === 1){
-        $user->editUserInfo($_POST['mail'],$_POST['upass'], $_POST['newupass']);
+        $user->editUserInfo($_POST['mail'],$_POST['upass'], $_POST['newupass'], $_SESSION['user_id'], $_SESSION['user_role'], 1);
 
     }else {
     foreach ($feedback as $item) {
@@ -46,7 +46,7 @@ if(isset($_GET['succes'])) {
         <form method="post" >
         <div class="form-group " style="max-width: 250px;">
             <label for="name">Username</label>
-            <input type="text" name="name" class="form-control" id="name" value="<?php echo $_SESSION['user_name']; ?>">
+            <input type="text" name="name" readonly class="form-control" id="name" value="<?php echo $_SESSION['user_name']; ?>">
         </div> 
         <div class="form-group mt-3" style="max-width: 250px;">
             <label for="mail">Email address</label>
