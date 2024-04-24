@@ -23,36 +23,35 @@ if(isset($_POST['search'])) {
 
 
 
-<div class="container ">
+<div class="container">
     <div class="row mt-5 mb-5">
-        <div class="col">
-        <form method="post" >        
-        <div class="form-group mt-3" style="max-width: 250px;">
-            <label for="search">Search for user</label>
-            <input type="text" name="search" class="form-control" id="search" placeholder="Username or email">
+        <!-- Search form column -->
+        <div class="col-md-6">
+            <form method="post">        
+                <div class="form-group mt-3">
+                    <label for="search">Search for user</label>
+                    <input type="text" name="search" class="form-control" id="search" placeholder="Username or email">
+                </div>
+                <div class="mt-3">
+                    <a href="home.php" class="btn btn-primary">Return</a>
+                    <button type="submit" name="search-button" class="btn btn-success ms-2">Search</button>
+                </div>
+            </form> 
         </div>
 
-        <a href="home.php" type="button" class="btn btn-primary mt-3">Return</a>
-        <button type="submit" name="search-button" class="btn btn-success mt-3">Search</button>
-        </form> 
-</div>
-
-<div class="col">
-    <?php if(isset($_POST['search'])) {
-        foreach ($user_array as $data){
-            echo "<div class='row'>
-                <div class='col'>
-                     <h5>{$data['u_name']}</h5>
-                </div>
-                <div class='col'>
-                <a type='button' class='btn btn-primary mt-3 '  href='admin-account.php?uid={$data['u_id']}'>Edit user</a>
-           </div>
-            </div>";
-        }
-    }
-    ?>
-</div>
-</div>
+        <!-- Results column -->
+        <div class="col-md-6">
+            <?php if (isset($_POST['search'])): ?>
+                <?php foreach ($user_array as $data): ?>
+                    <h5 class="mt-5">Username: </h5>
+                    <div class="d-flex  align-items-center mt-3">
+                        <h5 class="me-5"><?php echo htmlspecialchars($data['u_name']); ?></h5>
+                        <a href="admin-account.php?uid=<?php echo $data['u_id']; ?>" class="btn btn-primary">Edit user</a>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
 </div>
 
 

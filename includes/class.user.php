@@ -78,6 +78,9 @@ private function cleanInput($data) {
 }
 
     public function register($uname, $umail, $upass) {
+        $errorMessages = [];
+        $errorState = 0;
+        
         $new_upass = password_hash($upass, PASSWORD_DEFAULT);
         $uname = $this->cleanInput($uname);
         
@@ -97,6 +100,9 @@ private function cleanInput($data) {
     }
       
     public function login($unamemail, $upass){
+        $errorMessages = [];
+        $errorState = 0;
+ 
         $stmt_selectLoginInfo = $this->pdo->prepare('SELECT * FROM table_user WHERE u_name = :uname OR u_email = :uemail');
         $stmt_selectLoginInfo->bindParam(":uname", $unamemail, PDO::PARAM_STR);
         $stmt_selectLoginInfo->bindParam(":uemail", $unamemail, PDO::PARAM_STR);
@@ -171,11 +177,8 @@ private function cleanInput($data) {
             return "The password is invalid ";
             }
         } 
-        
-
-    
-        
         $new_upass = password_hash($newpass, PASSWORD_DEFAULT);
+        
         //Updating user info
         $stmt_updateUserInfo = $this->pdo->prepare('UPDATE table_user SET u_email = :umail, u_password = :upassword, u_role_fk = :urole, u_status = :ustatus WHERE u_id = :id ');
         $stmt_updateUserInfo->bindParam(":id" , $uid, PDO::PARAM_INT);
@@ -187,11 +190,11 @@ private function cleanInput($data) {
             $_SESSION['user_email'] = $umail;
             header('Location: account.php?succes=1');
         } else {
-            array_push($errorMessages,"Something went wrong");
-            $errorState = 1;
-            return $errorMessages;      
+            header('Location: account.php?denied=1');
+                 
+        }
     }
-}
+
 
     public function searchUsers($input) {
         $inputJoker = "%{$input}%";

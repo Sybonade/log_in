@@ -41,30 +41,36 @@ if(isset($_GET['succes'])) {
 ?>
 
 
-<div class="container-fluid ">
-    <div class="row m-5">
-        <form method="post" >
-        <div class="form-group " style="max-width: 250px;">
-            <label for="name">Username</label>
-            <input type="text" name="name" readonly class="form-control" id="name" value="<?php echo $_SESSION['user_name']; ?>">
-        </div> 
-        <div class="form-group mt-3" style="max-width: 250px;">
-            <label for="mail">Email address</label>
-            <input type="email" name="mail" class="form-control" id="mail" aria-describedby="mail" value="<?php echo $_SESSION['user_email']; ?>">
-        </div>                                                      
-        
-        <div class="form-group mt-3" style="max-width: 250px;">
-            <label for="upass">Old Password</label>
-            <input type="password" name="upass" class="form-control" id="upass" placeholder="Password">
-            <label for="upass">New Password</label>
-            <input type="password" name="newupass" class="form-control" id="upass" placeholder="Password">
-            <label class="mt-3" for="upassrepeat">Re-enter new password</label>
-            <input type="password" name="newupassrepeat" class="form-control" id="upassrepeat" placeholder="Password">
-
+<div class="container">
+    <div class="row justify-content-center m-5">
+        <div class="col-md-6">
+        <h1>Update user info</h1>
+            <form method="post">
+                <div class="form-group">
+                    <label for="name">Username</label>
+                    <input type="text" name="name" class="form-control" id="name" readonly value="<?php echo $_SESSION['user_name']; ?>">
+                </div>
+                <div class="form-group mt-3">
+                    <label for="mail">Email address</label>
+                    <input type="email" name="mail" class="form-control" id="mail" value="<?php echo $_SESSION['user_email']; ?>">
+                </div>
+                <div class="form-group mt-3">
+                    <label for="upass">Old Password</label>
+                    <input type="password" name="upass" class="form-control" id="upass" placeholder="Old Password">
+                </div>
+                <div class="form-group mt-3">
+                    <label for="newupass">New Password</label>
+                    <input type="password" name="newupass" class="form-control" id="newupass" placeholder="New Password">
+                </div>
+                <div class="form-group mt-3">
+                    <label for="newupassrepeat">Re-enter new password</label>
+                    <input type="password" name="newupassrepeat" class="form-control" id="newupassrepeat" placeholder="Re-enter New Password">
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-3">
+                    <a href="home.php" class="btn btn-primary">Return</a>
+                    <button type="submit" name="edit-user" class="btn btn-success ">Update Info</button>
+                </div>
+            </form>
         </div>
-
-        <a href="home.php" type="button" class="btn btn-primary mt-3">Return</a>
-        <button type="submit" name="edit-user" class="btn btn-success mt-3">Update Info</button>
-
-        </form> 
+    </div>
 </div>

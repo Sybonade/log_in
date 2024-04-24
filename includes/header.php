@@ -70,10 +70,6 @@ $menuLinks = array(
           echo "<li class='nav-item'>
           <a class='nav-link ' href='?logout=1.php'>Log out</a>
         </li>";
-        }else {
-          echo "<li class='nav-item'>
-          <a class='nav-link ' href='register.php'>Register</a>
-        </li>";
         }
         ?>
         
@@ -81,7 +77,4 @@ $menuLinks = array(
     </div>
   </div>
 </nav>
-	<div class="hero-section row align-items-center justify-content-center">
-      <h1 class="text-center" id="hero-slogan">We only have the best</h1>
-	</div>
 </header>
